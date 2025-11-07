@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatório Detalhado de Pedidos{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Relatório Detalhado de Pedidos Fechados</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="filter-section">
+            <form method="POST" action="{{ url_for('relatorio_detalhado_web') }}">
+                <label for="data_relatorio">Selecionar Data:</label>
+                <input type="date" id="data_relatorio" name="data_relatorio" value="{{ data_relatorio_str if data_relatorio_str else today_str }}" required>
+                <button type="submit" class="button">Filtrar</button>
+            </form>
+        </div>
+
+        <h3>Pedidos Fechados em: {{ data_relatorio.strftime('%d/%m/%Y') }}</h3>
+
+        {% if pedidos_detalhados %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Comanda</th>
+                        <th>ID Pedido</th>
+                        <th>Aberto em</th>
+                        <th>Fechado em</th>
+                        <th>Valor Final</th>
+                        <th>Forma Pgto.</th>
+                        <th>Itens</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in pedidos_detalhados %}
+                        <tr>
+                            <td>{{ pedido.comanda_id }}</td>
+                            <td>{{ pedido.pedido_id }}</td>
+                            <td>{{ pedido.data_abertura.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>{{ pedido.data_fechamento.strftime('%d/%m/%Y %H:%M') if pedido.data_fechamento else 'N/A' }}</td>
+                            <td>R$ {{ "%.2f"|format(pedido.valor_total) }}</td>
+                            <td>{{ pedido.forma_pagamento if pedido.forma_pagamento else 'N/A' }}</td>
+                            <td>{{ pedido.itens_formatados if pedido.itens_formatados else 'Nenhum item registrado' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Nenhum pedido fechado encontrado para esta data.</p>
+        {% endif %}
+
+        <div class="actions" style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('gerar_excel_detalhado') }}" class="button primary" style="background-color: #00A0A0; color: white;">Exportar Excel Detalhado</a> {# Ciano #}
+            <a href="{{ url_for('gerar_pdf_detalhado') }}" class="button primary" style="background-color: #C93227; color: white;">Exportar PDF Detalhado</a> {# Vermelho #}
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="{{ url_for('index') }}" class="button">Voltar para Pedidos Abertos</a>
+            <a href="{{ url_for('relatorios_web') }}" class="button secondary">Voltar para Relatórios Mensais</a>
+            <a href="{{ url_for('relatorio_diario_web') }}" class="button secondary">Voltar para Relatório Diário</a>
+        </div>
+    </div>
+{% endblock %}

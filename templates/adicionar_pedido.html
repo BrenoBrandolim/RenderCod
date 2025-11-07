@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Novo Pedido{% endblock %}
+
+{% block content %}
+    <h1>Adicionar Novo Pedido</h1>
+
+    <p style="font-weight:bold; color:#444;">
+        💡 Comanda sugerida: {{ sugestao_comanda }}
+    </p>
+
+    <form method="POST" action="{{ url_for('adicionar_pedido_web') }}">
+        <div class="form-group">
+            <label for="comanda_id">Número da Comanda:</label>
+            <input type="number" id="comanda_id" name="comanda_id"
+                   value="{{ sugestao_comanda }}" required min="1">
+        </div>
+        <button type="submit" class="button primary">Abrir Novo Pedido</button>
+    </form>
+
+
+<script>
+window.addEventListener("keydown", function(e) {
+    // Detecta F6 mesmo com campo de texto focado
+    if (e.code === "F6" || e.keyCode === 117) { 
+        e.preventDefault();
+        console.log("F6 detectado — criando pedido automático...");
+
+        fetch("/criar_pedido_automatico", { method: "POST" })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Pedido criado:", data);
+                    window.location.href = `/pedido/${data.pedido_id}/adicionar_itens`;
+                } else {
+                    alert("Erro ao criar pedido: " + (data.error || "Erro desconhecido"));
+                }
+            })
+            .catch(err => {
+                console.error("Erro no fetch:", err);
+                alert("Falha ao criar pedido automaticamente!");
+            });
+    }
+}, true); // 'true' força captura antes de qualquer input
+</script>
+
+{% endblock %}
+

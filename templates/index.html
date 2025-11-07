@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Pedidos Atuais</h2>
+    {% if pedidos %}
+        <ul class="order-list">
+            {% for pedido in pedidos %}
+            <li class="order-item">
+                <h3>Comanda: {{ pedido.comanda_id }} (ID do Pedido: {{ pedido.id }})</h3>
+                <p>Valor Total: R$ {{ "%.2f"|format(pedido.valor_total) }}</p>
+                <p>Aberto em: {{ pedido.data_abertura.strftime('%d/%m/%Y %H:%M') }}</p>
+                <div class="actions">
+                    <a href="{{ url_for('adicionar_itens_web', pedido_id=pedido.id) }}" class="button add-item-btn">Adicionar Itens</a>
+                    <a href="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}" class="button edit-order-btn">Detalhes / Editar</a>
+                    <a href="{{ url_for('encerrar_pedido_web', comanda_id=pedido.comanda_id) }}" class="button primary">Encerrar Pedido</a>
+                    </div>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Não há pedidos abertos no momento.</p>
+        <p><a href="{{ url_for('adicionar_pedido_web') }}" class="button">Abrir Novo Pedido</a></p>
+    {% endif %}
+</div>
+
+<script>
+window.addEventListener("keydown", function(e) {
+    // Detecta F6 mesmo com campo de texto focado
+    if (e.code === "F6" || e.keyCode === 117) { 
+        e.preventDefault();
+        console.log("F6 detectado — criando pedido automático...");
+
+        fetch("/criar_pedido_automatico", { method: "POST" })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Pedido criado:", data);
+                    window.location.href = `/pedido/${data.pedido_id}/adicionar_itens`;
+                } else {
+                    alert("Erro ao criar pedido: " + (data.error || "Erro desconhecido"));
+                }
+            })
+            .catch(err => {
+                console.error("Erro no fetch:", err);
+                alert("Falha ao criar pedido automaticamente!");
+            });
+    }
+}, true); // 'true' força captura antes de qualquer input
+</script>
+{% endblock %}

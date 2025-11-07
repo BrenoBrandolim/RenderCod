@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gerenciador de Pedidos{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>COMENZA</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Pedidos Abertos</a></li>
+                <li><a href="{{ url_for('adicionar_pedido_web') }}">Abrir Novo Pedido</a></li>
+                <li><a href="{{ url_for('editar_pedido_web') }}">Editar Pedido</a></li>
+                <li><a href="{{ url_for('encerrar_pedido_web') }}">Encerrar Pedido</a></li>
+                <!-- Adicione no base.html ou onde preferir -->
+                <li><a href="{{ url_for('acompanhamento_bebidas') }}">Acompanhamento de Bebidas</a></li>
+                <li><a href="{{ url_for('cancelar_pedido_web') }}">Cancelar Pedido</a></li> {# Adicionado: Link para Cancelar Pedido #}
+                <li><a href="{{ url_for('relatorios_web') }}">Admin</a></li>
+                <li><a href="{{ url_for('relatorio_diario_web') }}">Relatório Diário</a></li>
+                <li><a href="{{ url_for('relatorio_detalhado_web') }}">Relatório Detalhado</a></li> {# Adicionado: Link para Relatório Diário #}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; {{ current_year }} Comenza Food. Todos os direitos reservados.</p>
+        <p>Monte Mor, SP, Brasil - {{ current_day }} de {{ current_month_name }} de {{ current_year }}</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Encerrar Pedido{% endblock %}
+
+{% block content %}
+<h1>Encerrar Pedido</h1>
+
+{% if pedido %}
+    <h2>Valor a Pagar: <span class="highlight-total">R$ {{ "%.2f"|format(pedido.valor_total) }}</span></h2>
+    <p>Confirmar o número da comanda <strong>{{ pedido.comanda_id }}</strong> e selecionar a forma de pagamento.</p>
+{% else %}
+    <p>Insira o número da comanda do pedido que deseja encerrar e a forma de pagamento.</p>
+{% endif %}
+
+<form method="POST" action="{{ url_for('encerrar_pedido_web') }}">
+    <div class="form-group">
+        <label for="comanda_id">Número da Comanda:</label>
+        <input
+            type="number"
+            id="comanda_id"
+            name="comanda_id"
+            value="{{ pedido.comanda_id if pedido else comanda_id_prefilled if comanda_id_prefilled else '' }}"
+            required
+            min="1"
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="forma_pagamento">Forma de Pagamento:</label>
+        <select id="forma_pagamento" name="forma_pagamento" required>
+            <option value="">-- Selecione --</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartao Credito">Cartão Crédito</option>
+            <option value="Cartao Debito">Cartão Débito</option>
+            <option value="Pix">Pix</option>
+            <option value="Voucher">Voucher</option>
+            <option value="Hibrido">Híbrido (Dinheiro + Cartão, etc.)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="observacao_pagamento">Observação (Opcional - ex: detalhes para Híbrido):</label>
+        <textarea id="observacao_pagamento" name="observacao_pagamento" rows="3"></textarea>
+    </div>
+
+    <div class="button-group">
+        <button type="submit" class="button primary">💾 Confirmar Encerramento</button>
+
+        {% if pedido %}
+        <!-- Botão de impressão igual ao da página "Adicionar Itens" -->
+        <a href="{{ url_for('imprimir_automatico', pedido_id=pedido['id']) }}"
+           target="_blank"
+           class="button primary"
+           style="background-color:#2196F3;">
+           🖨️ Imprimir Comanda
+        </a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

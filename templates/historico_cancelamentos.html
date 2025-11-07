@@ -1,0 +1,25 @@
+{% extends "admin.html" %}
+{% block title %}Histórico de Cancelamentos{% endblock %}
+{% block content %}
+<h2>Histórico de Cancelamentos de Pedidos</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Data/Hora Cancelamento</th>
+            <th>Comanda</th>
+            <th>Valor Total</th>
+            <th>Detalhes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for registro in historico %}
+        <tr>
+            <td>{{ registro.data_cancelamento.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ registro.comanda_id }}</td>
+            <td>R$ {{ "{:,.2f}".format(registro.valor_total).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
+            <td>{{ registro.detalhes }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

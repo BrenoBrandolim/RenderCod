@@ -1,0 +1,37 @@
+[12:21, 28/10/2025] Breno New: {% extends "admin.html" %}
+
+{% block title %}Relatório por Período{% endblock %}
+
+{% block content %}
+  <h2>Relatório de Entradas por Período</h2>
+
+  <form method="POST" action="{{ url_for('relatorio_periodo_web') }}" class="form-container">
+      <div class="form-group">
+          <label for="data_inicial">Data Inicial:</label>
+          <input type="date" id="data_inicial" name="data_inicial" required>
+      </div>
+      <div class="form-group">
+          <label for="data_final">Data Final:</label>
+          <input type="date" id="data_final" name="data_final" required>
+      </div>
+      <button type="submit" class="button">Gerar Relatório</button>
+  </form>
+
+  {% if resultados %}
+    <hr>
+    <h2>Resumo do Período: {{ data_inicial.strftime('%d/%m/%Y') }} a {{ data_final.strftime('%d/%m/%Y') }}</h2>
+
+    <p>Total de Pedidos Fechados: {{ resultados.total_pedidos_periodo }}</p>
+    <p>Valor Total de Vendas: R$ {{ "{:,.2f}".format(resultados.valor_total_periodo).replace(",", "X").replace(".", ",").replace("X", ".") }}</p>
+
+    <h3 style="color: rgb(162, 24, 24);">
+      Lucro Líquido: R$ {{ "{:,.2f}".format(resultados.lucro_liquido_total).replace(",", "X").replace(".", ",").replace("X", ".") }}
+    </h3>
+
+    <div class="actions" style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('gerar_pdf_periodo', data_inicial=data_inicial.strftime('%Y-%m-%d'), data_final=data_final.strftime('%Y-%m-%d')) }}" 
+           class="button primary" style="background-color: #C93227; color: white;">Gerar PDF</a>
+    </div>
+  {% endif %}
+{% endblock %}
+[12:21, 28/10/2025] Breno New: <li><a href="{{ url_for('relatorio_periodo_web') }}">Relatório por Período</a></li>

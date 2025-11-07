@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Login Admin{% endblock %}
+{% block content %}
+<div style="max-width: 400px; margin: 40px auto; padding: 32px 24px; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(0,0,0,0.08);">
+    <h2 style="text-align:center; color:#C93227; margin-bottom:24px;">Acesso Administrativo</h2>
+    <form method="POST">
+        <div style="margin-bottom:18px;">
+            <label for="username" style="display:block; font-weight:600; color:#333;">Usuário:</label>
+            <input type="text" name="username" id="username" required style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+        </div>
+        <div style="margin-bottom:24px;">
+            <label for="senha" style="display:block; font-weight:600; color:#333;">Senha:</label>
+            <input type="password" name="senha" id="senha" required style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+        </div>
+        <button type="submit" style="width:100%; background:#C93227; color:#fff; font-weight:700; border:none; border-radius:6px; padding:10px 0; font-size:16px; cursor:pointer;">
+            Entrar
+        </button>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="margin-top:18px;">
+                {% for category, message in messages %}
+                    <div style="color: {% if category == 'error' %}#C93227{% else %}#00A0A0{% endif %}; font-weight:600; text-align:center;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+</div>
+{% endblock %}

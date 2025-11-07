@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes do Pedido #{{ pedido.comanda_id }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>Detalhes do Pedido #{{ pedido.comanda_id }} (ID: {{ pedido.id }})</h1>
+        <p>Valor Total: <span class="highlight">R$ {{ "%.2f"|format(pedido.valor_total) }}</span></p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <h3>Itens do Pedido:</h3>
+        {# Cada item agora tem seu próprio formulário para remoção parcial ou total #}
+        {% if itens %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Descrição</th>
+                        <th>Quantidade</th>
+                        <th>Preço Unitário</th>
+                        <th>Valor do Item</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in itens %}
+                        <tr>
+                            <td>{{ item.nome_item }}</td>
+                            <td>{{ item.observacao_item if item.observacao_item else '-' }}</td> {# Usando observacao_item para consistência #}
+                            <td>{{ item.quantidade }}</td>
+                            <td>R$ {{ "%.2f"|format(item.preco_unitario) }}</td>
+                            <td>R$ {{ "%.2f"|format(item.valor_item) }}</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}" style="display:inline-block; margin-bottom: 5px;">
+                                    <input type="hidden" name="item_id_para_remover" value="{{ item.id }}">
+                                    <input type="number"
+                                           name="quantidade_a_remover"
+                                           min="1"
+                                           max="{{ item.quantidade }}"
+                                           value="1"
+                                           placeholder="Qtd."
+                                           style="width: 60px;">
+                                    <button type="submit" name="action_type" value="remover_parcial" class="button button-remove-line small-button">Remover</button>
+                                    <button type="submit" name="action_type" value="remover_tudo" class="button button-remove-line small-button">Remover Tudo</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Este pedido não possui itens.</p>
+        {% endif %}
+
+        <hr>
+
+        {# Seções para adicionar Prato Dinâmico, Sobremesa Dinâmica e Item Variado Dinâmico (MANTIDAS) #}
+        <div class="form-section">
+            <h2>Adicionar Prato Dinâmico</h2>
+            <form method="POST" action="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}">
+                <input type="hidden" name="action_type" value="adicionar_prato_dinamico">
+                <div class="form-group">
+                    <label for="prato_preco_dinamico">Valor do Prato: R$</label>
+                    <input type="text" id="prato_preco_dinamico" name="prato_preco" placeholder="Ex: 25.50" pattern="[0-9]+([,\\.][0-9]{1,2})?" title="Use números e, opcionalmente, ponto ou vírgula para centavos. Ex: 25.50" required>
+                </div>
+                <div class="form-group">
+                    <label for="prato_observacao_dinamico">Observação (Opcional):</label>
+                    <input type="text" id="prato_observacao_dinamico" name="observacao_item" placeholder="Ex: Carne, Arroz, Feijão, Batata Palha">
+                </div>
+                <button type="submit" class="button primary">Adicionar Prato</button>
+            </form>
+        </div>
+        
+                <div class="form-section">
+            <h2>Adicionar Marmitas</h2>
+            <form method="POST" action="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}">
+                <input type="hidden" name="action_type" value="adicionar_produto_selecionado">
+                <div class="form-group">
+                    <label for="marmita_id">Selecione a Marmita:</label>
+                    <select id="marmita_id" name="produto_id" required>
+                        <option value="">-- Selecione --</option>
+                        {% for marmita in marmitas %}
+                            <option value="{{ marmita.id }}">{{ marmita.nome }} (R${{ "%.2f"|format(marmita.preco) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="qtd_marmita">Quantidade:</label>
+                    <input type="number" id="qtd_marmita" name="quantidade" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="observacao_marmita">Observação (Opcional):</label>
+                    <textarea id="observacao_marmita" name="observacao_produto_selecionado" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Marmita</button>
+            </form>
+        </div>
+
+        <hr> {# Linha divisória opcional #}
+
+        <div class="form-section">
+            <h2>Adicionar Bebidas</h2>
+            <form method="POST" action="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}">
+                <input type="hidden" name="action_type" value="adicionar_produto_selecionado">
+                <div class="form-group">
+                    <label for="bebida_id">Selecione a Bebida:</label>
+                    <select id="bebida_id" name="produto_id" required>
+                        <option value="">-- Selecione --</option>
+                        {% for bebida in bebidas %}
+                            <option value="{{ bebida.id }}">{{ bebida.nome }} (R${{ "%.2f"|format(bebida.preco) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="qtd_bebida">Quantidade:</label>
+                    <input type="number" id="qtd_bebida" name="quantidade" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="observacao_bebida">Observação (Opcional):</label>
+                    <textarea id="observacao_bebida" name="observacao_produto_selecionado" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Bebida</button>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h2>Adicionar Sobremesa Dinâmica</h2>
+            <form method="POST" action="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}">
+                <input type="hidden" name="action_type" value="adicionar_sobremesa_dinamica">
+                <div class="form-group">
+                    <label for="sobremesa_nome">Nome da Sobremesa:</label>
+                    <input type="text" id="sobremesa_nome" name="sobremesa_nome" placeholder="Ex: Pudim de Leite" required>
+                </div>
+                <div class="form-group">
+                    <label for="sobremesa_preco_dinamica">Valor da Sobremesa: R$</label>
+                    <input type="text" id="sobremesa_preco_dinamica" name="sobremesa_preco" placeholder="Ex: 12.00" pattern="[0-9]+([,\\.][0-9]{1,2})?" title="Use números e, opcionalmente, ponto ou vírgula para centavos. Ex: 12.00" required>
+                </div>
+                <div class="form-group">
+                    <label for="sobremesa_observacao_dinamica">Observação (Opcional):</label>
+                    <input type="text" id="sobremesa_observacao_dinamica" name="observacao_item" placeholder="Ex: Com calda extra">
+                </div>
+                <button type="submit" class="button primary">Adicionar Sobremesa</button>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h2>Adicionar Item Variado Dinâmico</h2>
+            <form method="POST" action="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}">
+                <input type="hidden" name="action_type" value="adicionar_item_variado_dinamico">
+                <div class="form-group">
+                    <label for="item_variado_nome">Nome do Item:</label>
+                    <input type="text" id="item_variado_nome" name="item_variado_nome" placeholder="Ex: Fruta, Salgado, Diversos" required>
+                </div>
+                <div class="form-group">
+                    <label for="item_variado_preco">Valor do Item: R$</label>
+                    <input type="text" id="item_variado_preco" name="item_variado_preco" placeholder="Ex: 5.00" pattern="[0-9]+([,\\.][0-9]{1,2})?" title="Use números e, opcionalmente, ponto ou vírgula para centavos. Ex: 5.00" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantidade_item_variado">Quantidade:</label>
+                    <input type="number" id="quantidade_item_variado" name="quantidade_item_variado" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="item_variado_observacao">Observação (Opcional):</label>
+                    <input type="text" id="item_variado_observacao" name="observacao_item" placeholder="Ex: Banana, Esfiha de Carne">
+                </div>
+                <button type="submit" class="button primary">Adicionar Item Variado</button>
+            </form>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="{{ url_for('index') }}" class="button">Voltar para Pedidos Abertos</a>
+            <a href="{{ url_for('encerrar_pedido_web', comanda_id=pedido.comanda_id) }}" class="button button-success">Encerrar Pedido</a>
+            <a href="{{ url_for('cancelar_pedido_web') }}" class="button button-danger">Cancelar Pedido</a>
+        </div>
+
+        <script>
+            // Script para formatar preço com ponto/vírgula dinamicamente (mantido)
+            document.addEventListener('DOMContentLoaded', () => {
+                const formatPriceInput = (inputElement) => {
+                    inputElement.addEventListener('input', (event) => {
+                        let value = event.target.value;
+                        value = value.replace(/[^0-9,.]/g, '');
+                        value = value.replace(',', '.');
+                        const parts = value.split('.');
+                        if (parts.length > 2) {
+                            value = parts[0] + '.' + parts.slice(1).join('');
+                        }
+                        event.target.value = value;
+                    });
+                };
+
+                const pratoPrecoInput = document.getElementById('prato_preco_dinamico');
+                if (pratoPrecoInput) {
+                    formatPriceInput(pratoPrecoInput);
+                }
+
+                const sobremesaPrecoInput = document.getElementById('sobremesa_preco_dinamica');
+                if (sobremesaPrecoInput) {
+                    formatPriceInput(sobremesaPrecoInput);
+                }
+
+                const itemVariadoPrecoInput = document.getElementById('item_variado_preco');
+                if (itemVariadoPrecoInput) {
+                    formatPriceInput(itemVariadoPrecoInput);
+                }
+            });
+        </script>
+    </div>
+{% endblock %}

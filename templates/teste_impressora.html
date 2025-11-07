@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Teste de Impressora{% endblock %}
+
+{% block content %}
+<h2>🧾 Teste de Impressora Térmica</h2>
+<p>Clique no botão abaixo para enviar uma impressão de teste para a impressora padrão (ELGIN i9 USB).</p>
+
+<button onclick="imprimirTeste()" class="button primary">🖨️ Imprimir Teste</button>
+
+<p id="status"></p>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qz-tray/2.1.0/qz-tray.js"></script>
+<script>
+qz.security.setCertificatePromise(resolve => resolve(""));
+qz.security.setSignaturePromise(() => Promise.resolve(""));
+
+async function imprimirTeste() {
+  const statusEl = document.getElementById('status');
+  statusEl.textContent = "🔄 Conectando ao QZ Tray...";
+  try {
+    if (!qz.websocket.isActive()) {
+      await qz.websocket.connect();
+      statusEl.textContent = "✅ QZ Tray conectado!";
+    }
+
+    const texto = `
+---------------------------
+   TESTE DE IMPRESSORA
+---------------------------
+Impressora: ELGIN i9 (USB)
+Data: ${new Date().toLocaleString('pt-BR')}
+---------------------------
+Sucesso! 🎉
+`;
+
+    const config = qz.configs.create(null); // impressora padrão
+    const data = [{ type: 'raw', format: 'plain', data: texto }];
+    await qz.print(config, data);
+    statusEl.textContent = "✅ Impressão enviada com sucesso!";
+  } catch (e) {
+    console.error("Erro:", e);
+    statusEl.textContent = "❌ Erro ao imprimir. Verifique se o QZ Tray está aberto e permitido.";
+  }
+}
+</script>
+{% endblock %}

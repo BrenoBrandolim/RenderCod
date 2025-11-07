@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Pedidos Ativos{% endblock %}
+
+{% block content %}
+    <h1>Pedidos Ativos</h1>
+
+    {% if pedidos %}
+        {% for pedido in pedidos %}
+            <div class="card pedido-detalhe-card">
+                <h3>Comanda: {{ pedido.comanda_id }} (ID: {{ pedido.id }})</h3>
+                <p>Aberto em: {{ pedido.data_abertura.strftime('%d/%m/%Y %H:%M') }}</p>
+                <h4>Itens do Pedido:</h4>
+                {% if pedido.itens %}
+                    <table class="data-table small-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qtd</th>
+                                <th>Preço Unitário</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in pedido.itens %}
+                                <tr>
+                                    <td>{{ item.nome_item }}</td>
+                                    <td>{{ item.quantidade }}</td>
+                                    <td>R${{ "%.2f"|format(item.preco_unitario) }}</td>
+                                    <td>R${{ "%.2f"|format(item.valor_item) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}\
+                    <p>Este pedido não possui itens.</p>
+                {% endif %}
+                <p class="pedido-total"><strong>Valor Total do Pedido: R${{ "%.2f"|format(pedido.valor_total) }}</strong></p>
+                <div class="actions">
+                    <a href="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido.id) }}" class="button secondary small">Editar Pedido</a>
+                    <form action="{{ url_for('encerrar_pedido_web') }}" method="GET" style="display:inline-block;">
+                        <input type="hidden" name="comanda_id" value="{{ pedido.comanda_id }}">
+                        <button type="submit" class="button primary small">Encerrar Pedido</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhum pedido ativo no momento. Por favor, adicione um novo pedido.</p>
+    {% endif %}
+{% endblock %}

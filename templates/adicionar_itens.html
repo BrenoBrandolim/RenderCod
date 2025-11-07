@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Itens ao Pedido {{ pedido.comanda_id }}{% endblock %}
+
+{% block content %}
+    <h1>Adicionar Itens ao Pedido (Comanda: {{ pedido.comanda_id }})</h1>
+
+    {% if pedido.valor_total is defined and pedido.valor_total > 0 %}
+        <h2>Valor Atual do Pedido: <span class="highlight-total">R$ {{ "%.2f"|format(pedido.valor_total) }}</span></h2>
+    {% else %}
+        <h2>Valor Atual do Pedido: <span class="highlight-total">R$ 0,00</span></h2>
+    {% endif %}
+
+    <div class="form-sections-grid">
+        <!-- 1️⃣ Prato Dinâmico -->
+        <div class="form-section">
+            <h2>Adicionar Prato Dinâmico</h2>
+            <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
+                <input type="hidden" name="tipo_adicao" value="prato_dinamico">
+                <div class="form-group">
+                    <label for="prato_preco">Valor do Prato: R$</label>
+                    <input type="text" id="prato_preco" name="prato_preco" placeholder="Ex: 25,50" pattern="[0-9]+([,\\.][0-9]{1,2})?" title="Use números e, opcionalmente, ponto ou vírgula para centavos. Ex: 25.50" required>
+                </div>
+                <div class="form-group">
+                    <label for="prato_observacao">Observação (Opcional):</label>
+                    <textarea id="prato_observacao" name="prato_observacao" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Prato</button>
+            </form>
+        </div>
+
+        <!-- 2️⃣ Marmitas -->
+        <div class="form-section">
+            <h2>Adicionar Marmitas</h2>
+            <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
+                <input type="hidden" name="tipo_adicao" value="produto_selecionado">
+                <div class="form-group">
+                    <label for="marmita_id">Selecione a Marmita:</label>
+                    <select id="marmita_id" name="produto_id" required>
+                        <option value="">-- Selecione --</option>
+                        {% for marmita in marmitas %}
+                            <option value="{{ marmita.id }}">{{ marmita.nome }} (R${{ "%.2f"|format(marmita.preco) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="qtd_marmita">Quantidade:</label>
+                    <input type="number" id="qtd_marmita" name="quantidade" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="observacao_marmita">Observação (Opcional):</label>
+                    <textarea id="observacao_marmita" name="observacao_produto_selecionado" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Marmita</button>
+            </form>
+        </div>
+
+        <!-- 3️⃣ Prefeitura (novo campo) -->
+        <div class="form-section">
+            <h2>Adicionar Prefeitura</h2>
+            <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
+                <input type="hidden" name="tipo_adicao" value="produto_selecionado">
+                <div class="form-group">
+                    <label for="prefeitura_id">Prefeitura (R$28,00):</label>
+                    <select id="prefeitura_id" name="produto_id" required>
+                        {% for produto in produtos if produto.nome == 'Prefeitura' %}
+                            <option value="{{ produto.id }}">Prefeitura (R${{ "%.2f"|format(produto.preco) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="qtd_prefeitura">Quantidade:</label>
+                    <input type="number" id="qtd_prefeitura" name="quantidade" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="observacao_prefeitura">Observação (Opcional):</label>
+                    <textarea id="observacao_prefeitura" name="observacao_produto_selecionado" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Prefeitura</button>
+            </form>
+        </div>
+
+        <!-- 4️⃣ Bebidas -->
+        <div class="form-section">
+            <h2>Adicionar Bebidas</h2>
+            <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
+                <input type="hidden" name="tipo_adicao" value="produto_selecionado">
+                <div class="form-group">
+                    <label for="bebida_id">Selecione a Bebida:</label>
+                    <select id="bebida_id" name="produto_id" required>
+                        <option value="">-- Selecione --</option>
+                        {% for bebida in bebidas %}
+                            <option value="{{ bebida.id }}">{{ bebida.nome }} (R${{ "%.2f"|format(bebida.preco) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="qtd_bebida">Quantidade:</label>
+                    <input type="number" id="qtd_bebida" name="quantidade" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="caracteristica_bebida">Características:</label>
+                    <select name="caracteristica_bebida" id="caracteristica_bebida">
+                        <option value="Sem nada">Sem nada</option>
+                        <option value="Só limão">Só limão</option>
+                        <option value="Limão espremido e Gelo">Limão espremido e Gelo</option>
+                        <option value="Gelo e limão">Gelo e limão</option>
+                        <option value="Só gelo">Só gelo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="marmita_bebida">Para Marmita:</label>
+                    <select name="marmita_bebida" id="marmita_bebida">
+                        <option value="Não">Não</option>
+                        <option value="Sim">Sim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="observacao_bebida">Observação (Opcional):</label>
+                    <textarea id="observacao_bebida" name="observacao_produto_selecionado" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Bebida</button>
+            </form>
+        </div>
+
+        <!-- 5️⃣ Sobremesa -->
+        <div class="form-section">
+            <h2>Adicionar Sobremesa Dinâmica</h2>
+            <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
+                <input type="hidden" name="tipo_adicao" value="sobremesa_dinamica">
+                <div class="form-group">
+                    <label for="sobremesa_nome">Nome da Sobremesa:</label>
+                    <input type="text" id="sobremesa_nome" name="sobremesa_nome" placeholder="Ex: Pudim de Leite" required>
+                </div>
+                <div class="form-group">
+                    <label for="sobremesa_preco">Valor da Sobremesa: R$</label>
+                    <input type="text" id="sobremesa_preco" name="sobremesa_preco" placeholder="Ex: 12,00" pattern="[0-9]+([,\\.][0-9]{1,2})?" required>
+                </div>
+                <div class="form-group">
+                    <label for="sobremesa_observacao">Observação (Opcional):</label>
+                    <textarea id="sobremesa_observacao" name="sobremesa_observacao" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Sobremesa</button>
+            </form>
+        </div>
+
+        <!-- 6️⃣ Item Variado -->
+        <div class="form-section">
+            <h2>Adicionar Item Variado (Nome e Preço Customizáveis)</h2>
+            <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
+                <input type="hidden" name="tipo_adicao" value="item_variado_dinamico">
+                <div class="form-group">
+                    <label for="item_variado_nome">Nome do Item:</label>
+                    <input type="text" id="item_variado_nome" name="item_variado_nome" placeholder="Ex: Salgado Assado" required>
+                </div>
+                <div class="form-group">
+                    <label for="item_variado_preco">Valor do Item: R$</label>
+                    <input type="text" id="item_variado_preco" name="item_variado_preco" placeholder="Ex: 8,50" pattern="[0-9]+([,\\.][0-9]{1,2})?" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantidade_item_variado">Quantidade:</label>
+                    <input type="number" id="quantidade_item_variado" name="quantidade_item_variado" value="1" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="item_variado_observacao">Observação (Opcional):</label>
+                    <textarea id="item_variado_observacao" name="item_variado_observacao" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Item Variado</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 🟦 Botões e scripts originais -->
+    <div class="navigation-buttons">
+        <a href="{{ url_for('detalhes_edicao_pedido', pedido_id=pedido_id) }}" class="button secondary">Ver/Editar Itens do Pedido</a>
+        <a href="{{ url_for('encerrar_pedido_web', comanda_id=pedido.comanda_id) }}" class="button primary" style="background-color: #4CAF50;">Finalizar e Encerrar Pedido</a>
+        <a href="{{ url_for('index') }}" class="button">Voltar para Pedidos Abertos</a>
+        <a href="{{ url_for('imprimir_automatico', pedido_id=pedido_id) }}" class="button primary" style="background-color:#2196F3;">🖨️ Imprimir Comanda</a>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/qz-tray/2.1.0/qz-tray.js"></script>
+        <script>
+        qz.websocket.connect().catch(err => console.error("Erro ao conectar QZ Tray:", err));
+
+        function imprimirComanda(pedido_id) {
+            fetch(`/pedido/${pedido_id}/comanda_texto`)
+                .then(response => response.text())
+                .then(texto => {
+                    const config = qz.configs.create("ELGIN i9");
+                    const data = [{ type: 'raw', format: 'plain', data: texto }];
+                    qz.print(config, data)
+                    .then(() => console.log("Comanda impressa!"))
+                    .catch(err => console.error("Falha na impressão:", err));
+                });
+        }
+        </script>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pratoPrecoInput = document.getElementById('prato_preco');
+    const sobremesaPrecoInput = document.getElementById('sobremesa_preco');
+    const itemVariadoPrecoInput = document.getElementById('item_variado_preco');
+
+    function formatPriceInput(inputElement) {
+        if (inputElement) {
+            inputElement.addEventListener('blur', function() {
+                let value = this.value.replace(',', '.');
+                if (value && !isNaN(parseFloat(value))) {
+                    this.value = parseFloat(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+            });
+            inputElement.addEventListener('focus', function() {
+                this.value = this.value.replace('.', '').replace(',', '.');
+            });
+        }
+    }
+
+    formatPriceInput(pratoPrecoInput);
+    formatPriceInput(sobremesaPrecoInput);
+    formatPriceInput(itemVariadoPrecoInput);
+});
+</script>
+
+<script>
+window.addEventListener("keydown", function(e) {
+    if (e.code === "F7" || e.keyCode === 118) {
+        e.preventDefault();
+        const comanda = "{{ pedido.comanda_id }}";
+        console.log("F7 detectado — comanda:", comanda);
+
+        if (comanda && !isNaN(comanda)) {
+            // Força redirecionamento absoluto (corrige caching do navegador)
+            const url = `/encerrar_pedido?comanda_id=${encodeURIComponent(comanda)}`;
+            console.log("Redirecionando para:", url);
+            window.location.assign(url);
+        } else {
+            alert("Comanda não identificada!");
+        }
+    }
+}, true);
+</script>
+
+
+
+{% endblock %}

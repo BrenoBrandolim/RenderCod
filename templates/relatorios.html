@@ -1,0 +1,99 @@
+{% extends "admin.html" %}
+
+{% block content %}
+<h2>Relatórios de Vendas</h2>
+
+<form method="POST" action="{{ url_for('relatorios_web') }}" class="form-container">
+    <div class="form-group">
+        <label for="mes_relatorio">Mês:</label>
+        <select id="mes_relatorio" name="mes_relatorio">
+            {% for i in range(1, 13) %}
+                <option value="{{ i }}" {% if i == mes_f %}selected{% endif %}>
+                    {{ datetime.strptime(i | string, '%m').strftime('%B').capitalize() }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="ano_relatorio">Ano:</label>
+        <select id="ano_relatorio" name="ano_relatorio">
+            {% for i in range(datetime.now().year - 5, datetime.now().year + 2) %} {# Últimos 5 anos e próximos 2 #}
+                <option value="{{ i }}" {% if i == ano_f %}selected{% endif %}>{{ i }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="button">Gerar Relatório</button>
+</form>
+
+<hr>
+
+<<h2>Resumo do Mês: {{ mes_nome_f }} de {{ ano_f }}</h2>
+
+<h3 style="color: rgb(162, 24, 24);">
+  Lucro Líquido Total: R$ {{ "{:,.2f}".format(resultados.lucro_liquido_total).replace(",", "X").replace(".", ",").replace("X", ".") }}
+</h3>
+
+{% if resultados.total_vendas_mes > resultados.lucro_liquido_total %}
+  {% set perc = (resultados.lucro_liquido_total / (resultados.total_vendas_mes - resultados.lucro_liquido_total)) * 100 %}
+  <p style="color: rgb(24, 119, 162);">
+    Percentual de Lucro: {{ "{:.2f}".format(perc).replace(".", ",") }}%
+  </p>
+{% else %}
+  <p style="color: gray;">Percentual de Lucro: N/D</p>
+{% endif %}
+
+<p>Total de Pedidos Fechados: {{ resultados.total_pedidos_mes }}</p>
+<p>Valor Total de Vendas: R$ {{ "{:,.2f}".format(resultados.total_vendas_mes).replace(",", "X").replace(".", ",").replace("X", ".") }}</p>
+<p>Ticket Médio por Pedido: R$ {{ "{:,.2f}".format(resultados.ticket_medio_mes).replace(",", "X").replace(".", ",").replace("X", ".") }}</p>
+
+
+<h3>Produtos Mais Vendidos (Marmitas)</h3>
+{% if resultados.marmitas_mais_vendidas %}
+    <ul class="report-list">
+        {% for item in resultados.marmitas_mais_vendidas %}
+            <li>{{ item.nome_item }}: {{ item.total_vendido }} unidades</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhuma marmita vendida neste período.</p>
+{% endif %}
+
+<h3>Produtos Mais Vendidos (Bebidas)</h3>
+{% if resultados.bebidas_mais_vendidas %}
+    <ul class="report-list">
+        {% for item in resultados.bebidas_mais_vendidas %}
+            <li>{{ item.nome_item }}: {{ item.total_vendido }} unidades</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhuma bebida vendida neste período.</p>
+{% endif %}
+
+<h3>Vendas por Categoria de Item</h3>
+{% if resultados.vendas_por_categoria %}
+    <ul class="report-list">
+        {% for categoria, total in resultados.vendas_por_categoria.items() %}
+            <li>{{ categoria }}: R$ {{ "%.2f"|format(total) }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhuma venda por categoria neste período.</p>
+{% endif %}
+
+<h3>Vendas por Forma de Pagamento</h3>
+{% if resultados.vendas_por_forma_pagamento %}
+    <ul class="report-list">
+        {% for item in resultados.vendas_por_forma_pagamento %}
+            <li>{{ item.forma_pagamento }}: R$ {{ "%.2f"|format(item.total_pago) }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Nenhuma venda por forma de pagamento neste período.</p>
+{% endif %}
+
+<div class="actions" style="text-align: center; margin-top: 20px;">
+    <a href="{{ url_for('gerar_excel_mensal') }}" class="button primary" style="background-color: #00A0A0; color: white;">Exportar Excel Mensal</a> {# Ciano #}
+    <a href="{{ url_for('gerar_pdf_mensal') }}" class="button primary" style="background-color: #C93227; color: white;">Exportar PDF Mensal</a> {# Vermelho #}
+</div>
+
+{% endblock %}

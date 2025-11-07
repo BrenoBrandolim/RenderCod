@@ -1,0 +1,61 @@
+{% extends "base_acompanhamento.html" %}
+{% block content %}
+<h2 class="bebidas-title">Acompanhamento de Bebidas</h2>
+<div class="bebidas-container">
+    <table class="bebidas-table">
+        <thead>
+            <tr>
+                <th>Comanda</th>
+                <th>Bebida</th>
+                <th>Qtd</th>
+                <th>Características</th>
+                <th>Observação</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody id="bebidas-tbody">
+            <!-- O conteúdo será preenchido pelo JavaScript -->
+        </tbody>
+    </table>
+</div>
+<script>
+function atualizarBebidas() {
+    fetch('/api/bebidas_pendentes')
+        .then(response => response.json())
+        .then(bebidas => {
+            const tbody = document.getElementById('bebidas-tbody');
+            tbody.innerHTML = '';
+            if (bebidas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="nenhuma-bebida">Nenhuma bebida pendente.</td></tr>';
+            } else {
+                bebidas.forEach(bebida => {
+                    const caracter = bebida.descricao_item || '';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><span class="badge-comanda">${bebida.comanda_id}</span></td>
+                            <td>${bebida.nome_item}</td>
+                            <td>${bebida.quantidade}</td>
+                            <td>${caracter}</td>
+                            <td>${bebida.observacao_item || ''}</td>
+                            <td>
+                                <form method="post" style="display:inline;">
+                                    <input type="hidden" name="item_id" value="${bebida.id}">
+                                    <button type="submit" class="btn-entregue" title="Marcar como entregue" onclick="return confirm('Confirmar entrega da bebida?')">
+                                        <span class="icon-check">&#10004;</span> Entregue
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+        })
+        .catch(err => {
+            console.error('Erro ao buscar bebidas:', err);
+            document.getElementById('bebidas-tbody').innerHTML = '<tr><td colspan="6" class="nenhuma-bebida">Erro ao carregar bebidas.</td></tr>';
+        });
+}
+document.addEventListener('DOMContentLoaded', atualizarBebidas);
+setInterval(atualizarBebidas, 5000);
+</script>
+{% endblock %}

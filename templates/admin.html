@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gerenciador de Pedidos{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>COMENZA</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Menu</a></li>
+                <li><a href="{{ url_for('relatorios_web') }}">Relatórios Mensais</a></li>
+                <li><a href="{{ url_for('relatorio_diario_webadm') }}">Relatório Diário</a></li>
+                <li><a href="{{ url_for('relatorio_periodo_web') }}">Relatório Periodo</a></li>  
+                <li><a href="{{ url_for('historico_logins_admin') }}">Histórico de Logins Admin</a></li>
+                <li><a href="{{ url_for('historico_cancelamentos') }}">Histórico de Cancelamentos</a></li> 
+                <li><a href="{{ url_for('logout_admin') }}">Sair</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; {{ current_year }} Comenza Food. Todos os direitos reservados.</p>
+        <p>Monte Mor, SP, Brasil - {{ current_day }} de {{ current_month_name }} de {{ current_year }}</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

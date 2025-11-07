@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório Diário{% endblock %}
+
+{% block content %}
+    <h2>Relatório Diário de Vendas</h2>
+
+    <form method="POST" action="{{ url_for('relatorio_diario_web') }}" class="form-container">
+        <div class="form-group">
+            <label for="data_relatorio">Data:</label>
+            <input type="date" id="data_relatorio" name="data_relatorio" value="{{ data_relatorio.strftime('%Y-%m-%d') }}" required>
+        </div>
+        <button type="submit" class="button">Gerar Relatório Diário</button>
+    </form>
+
+    <hr>
+<h2>Resumo do Dia: {{ data_relatorio.strftime('%d/%m/%Y') }}</h2>
+
+<p>Valor Total de Vendas: R$ {{ "{:,.2f}".format(resultados.valor_total_vendas_dia).replace(",", "X").replace(".", ",").replace("X", ".") }}</p>
+
+<h3>Vendas por Forma de Pagamento</h3>
+
+{% if resultados.vendas_por_forma_pagamento_dia %}
+  <ul class="report-list">
+    {% for item in resultados.vendas_por_forma_pagamento_dia %}
+      <li>
+        {{ item.forma_pagamento }}: R$ {{ "{:,.2f}".format(item.total_pago).replace(",", "X").replace(".", ",").replace("X", ".") }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Nenhuma venda por forma de pagamento neste dia.</p>
+{% endif %}
+
+
+    <h3>Itens Vendidos no Dia</h3>
+    {% if resultados.itens_vendidos_dia %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Categoria</th>
+                    <th>Quantidade Total</th>
+                    <th>Valor Total do Item</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in resultados.itens_vendidos_dia %}
+                    <tr>
+                        <td>{{ item.nome_item }}</td>
+                        <td>{{ item.categoria }}</td>
+                        <td>{{ item.total_vendido }}</td>
+                        <td>R$ {{ "%.2f"|format(item.valor_total_item) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Nenhum item vendido neste dia.</p>
+    {% endif %}
+
+    <div class="actions" style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('gerar_excel_diario') }}" class="button primary" style="background-color: #00A0A0; color: white;">Exportar Excel Diário</a> {# Ciano #}
+        <a href="{{ url_for('gerar_pdf_diario') }}" class="button primary" style="background-color: #C93227; color: white;">Exportar PDF Diário</a> {# Vermelho #}
+    </div>
+
+{% endblock %}

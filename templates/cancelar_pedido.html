@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancelar Pedido{% endblock %}
+
+{% block content %}
+    <h1>Cancelar Pedido</h1>
+    <p>Esta operação é irreversível e excluirá o pedido aberto e todos os seus itens. Requer senha de administrador.</p>
+    <form method="POST" action="{{ url_for('cancelar_pedido_web') }}">
+        <div class="form-group">
+            <label for="comanda_id">Número da Comanda do Pedido a Cancelar:</label>
+            <input type="number" id="comanda_id" name="comanda_id" required min="1">
+        </div>
+        <div class="form-group">
+            <label for="senha">Senha de Administrador:</label>
+            <input type="password" id="senha" name="senha" required>
+        </div>
+        <button type="submit" class="button danger">Confirmar Cancelamento</button>
+    </form>
+{% endblock %}

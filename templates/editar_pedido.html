@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Buscar Pedido para Edição{% endblock %}
+
+{% block content %}
+    <h1>Buscar Pedido para Edição</h1>
+    <p>Insira o número da comanda para encontrar o pedido aberto que deseja editar ou adicionar itens.</p>
+    <form method="POST" action="{{ url_for('editar_pedido_web') }}">
+        <div class="form-group">
+            <label for="comanda_id">Número da Comanda:</label>
+            <input type="number" id="comanda_id" name="comanda_id" required min="1">
+        </div>
+        <button type="submit" class="button primary">Buscar Pedido</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "admin.html" %}
+{% block title %}Histórico de Logins Admin{% endblock %}
+{% block content %}
+<h2>Histórico de Logins de Administrador</h2>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Usuário</th>
+            <th>Data/Hora do Login</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for login in logins %}
+        <tr>
+            <td>{{ login.username }}</td>
+            <td>{{ login.data_login.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
