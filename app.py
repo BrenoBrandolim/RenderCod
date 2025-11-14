@@ -204,6 +204,42 @@ def adicionar_pedido_web():
                            sugestao_comanda=sugestao_comanda,
                            **get_template_date_vars())
 
+@require_admin_login
+@app.route('/criar_item', methods=['GET','POST'])
+def criar_novoproduto_web():
+    conn = get_db_connection()
+    if conn is None:
+        flash("Erro ao conectar ao banco de dados.", 'error')
+        return redirect(url_for('index'))
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    if request.method == 'POST':
+        nome = request.form.get('nome_produtoNew')
+        preco = request.form.get('preco_produtoNew')
+        custo = request.form.get('custo_produtoNew')
+        tipo = request.form.get('tipo_opcoes')
+        categoria = request.form.get('categoria_opcoes')
+
+
+        try:
+            cursor.execute("INSERT INTO  produtos (nome, preco, custo, tipo, categoria) VALUES(%s, %s, %s, %s, %s)"
+                        , (nome, preco, custo, tipo, categoria))
+
+            conn.commit()
+            flash(f"Produto '{nome}' criado com sucesso!", 'success')
+            return redirect(url_for('criar_novoproduto_web'))
+        
+        except Exception as e:
+            conn.rollback()
+            traceback.print_exc()
+            flash(f"Erro ao processar: {e}", 'error')
+            return render_template('criar_item.html')
+
+        finally:
+            cursor.close()
+            conn.close()
+            # 🟩 Retorna sempre o template no final
+    return render_template('criar_item.html')
 
 
 @app.route('/pedido/<int:pedido_id>/adicionar_itens', methods=['GET', 'POST'])
@@ -360,7 +396,7 @@ def adicionar_itens_web(pedido_id):
             return redirect(url_for('adicionar_itens_web', pedido_id=pedido_id))
 
         # ---------- GET ----------
-        cursor.execute("SELECT id, nome, preco FROM produtos WHERE tipo IN ('Marmita_P','Marmita_M','Marmita_G','Marmita_Economica') ORDER BY preco")
+        cursor.execute("SELECT id, nome, preco FROM produtos WHERE tipo IN ('Marmita_P','Marmita_M','Marmita_G','Marmita_Economica', 'Refeição', 'Marmita') ORDER BY preco")
         marmitas = cursor.fetchall()
 
         cursor.execute("SELECT id, nome, preco FROM produtos WHERE categoria = 'Bebida' ORDER BY nome")
@@ -385,6 +421,33 @@ def adicionar_itens_web(pedido_id):
         if cursor: cursor.close()
         if conn: conn.close()
     return redirect(url_for('index'))
+
+@app.route('/listar_produtos')
+def listar_produto_web():
+    conn = get_db_connection()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("Select id, nome, preco, custo, tipo, categoria from produtos order by categoria, nome")
+    produtos = cursor.fetchall()
+
+    conn.close()
+    cursor.close()
+
+    return render_template('listar_produtos.html', produtos=produtos)
+
+
+
+
+@app.route('/deletar_produto/<int:produto_id>', methods=['POST'])
+def deletar_produto_web(produto_id):
+    conn = get_db_connection()
+
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    cursor.execute("Delete * from produtos where id = %s", (produto_id,))
+    conn.commit()
+    flash(f"Produto ID {produto_id} exluíddo", 'success')
+    
 
 @app.route('/criar_pedido_automatico', methods=['POST'])
 def criar_pedido_automatico():
@@ -435,6 +498,7 @@ def pedidos_cancelados():
     cursor.close()
     conn.close()
     return render_template('mostrar_pedidos.html', pedidos=pedidos, titulo="Pedidos Cancelados")
+
 @app.route('/editar_pedido', methods=['GET', 'POST'])
 def editar_pedido_web():
     if request.method == 'POST':

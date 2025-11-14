@@ -1,0 +1,48 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Adicionar Novo Pedido{% endblock %}
+
+{% block content %}
+    <h1>Adicionar Novo Produto</h1>
+
+    <form method="POST" action="{{ url_for('criar_novoproduto_web') }}">
+        <div class="form-group">
+            <label for="nome_produtoNew">Nome do Produto: </label>
+            <input type="text" id="nome_produtoNew" name="nome_produtoNew" required>
+        </div>
+           
+        <div class="form-group">
+            <label for="preco_produtoNew">Preço do Produto: </label>
+            <input type="number" id="preco_produtoNew" name="preco_produtoNew" step="0.01" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="custo_produtoNew">Custo do Produto: </label>
+            <input type="number" id="custo_produtoNew" name="custo_produtoNew" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="tipo_produtoNew">Tipo do Produto: </label>
+            <select name="tipo_opcoes" id="tipo_opcoes">
+                <option value="Bebida">Bebida</option>
+                <option value="Refeição">Refeição</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="categoria_produtoNew">Categoria do Produto: </label>
+            <select name="categoria_opcoes" id="categoria_opcoes">
+                <option value="Bebida">Bebida</option>
+                <option value="Refeição">Refeição</option>
+            </select>
+            
+        </div>
+
+
+
+        <button type="submit" class="button primary">Enviar</button>
+    </form>
+
+{% endblock %}
+
