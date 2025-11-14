@@ -227,7 +227,8 @@ def criar_novoproduto_web():
 
             conn.commit()
             flash(f"Produto '{nome}' criado com sucesso!", 'success')
-            return redirect(url_for('criar_novoproduto_web'))
+            return redirect(url_for('listar_produto_web'))
+
         
         except Exception as e:
             conn.rollback()
@@ -444,10 +445,12 @@ def deletar_produto_web(produto_id):
 
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    cursor.execute("Delete * from produtos where id = %s", (produto_id,))
+    cursor.execute("Delete from produtos where id = %s", (produto_id,))
     conn.commit()
     flash(f"Produto ID {produto_id} exluíddo", 'success')
     
+    return redirect(url_for('listar_produto_web'))
+
 
 @app.route('/criar_pedido_automatico', methods=['POST'])
 def criar_pedido_automatico():

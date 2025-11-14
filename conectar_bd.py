@@ -5,8 +5,8 @@ from datetime import datetime
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',      # SEU USUÁRIO DO MYSQL AQUI!
-    'password': '91130120605', # SUA SENHA DO MYSQL AQUI!
-    'database': 'pedidos',     # Nome do seu banco de dados é 'Pedidos'
+    'password': '1234', # SUA SENHA DO MYSQL AQUI!
+    'database': 'Pedidos',     # Nome do seu banco de dados é 'Pedidos'
     'charset': 'utf8mb4',
     'cursorclass': pymysql.cursors.DictCursor # Isso faz com que cursor() retorne dicionários por padrão
 }

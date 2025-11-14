@@ -27,9 +27,10 @@
                 <td>{{ produto.tipo }}</td>
                 <td>{{ produto.categoria }}</td>
                 <td>
-                    <action="{{ url_for('deletar_produto_web', produto_id=produto.id) }}" onsubmit="return confirm('Tem certeza que deseja excluir {{ produto.nome }}?');">
+                    <form method="POST" action="{{ url_for('deletar_produto_web', produto_id=produto.id) }}" 
+                    onsubmit="return confirm('Tem certeza que deseja excluir {{ produto.nome }}?');">
                         <button type="submit">Deletar</button>
-                    </action>
+                    </form>
                 </td>
 
             </tr>
