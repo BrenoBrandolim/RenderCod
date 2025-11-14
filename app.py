@@ -403,6 +403,13 @@ def adicionar_itens_web(pedido_id):
         cursor.execute("SELECT id, nome, preco FROM produtos WHERE categoria = 'Bebida' ORDER BY nome")
         bebidas = cursor.fetchall()
 
+        cursor.execute("SELECT id, nome, preco FROM produtos WHERE tipo = 'Suco' ORDER BY nome")
+        sucos = cursor.fetchall()
+
+        cursor.execute("SELECT id, nome, preco FROM produtos WHERE tipo = 'Refrigerante' ORDER BY nome")
+        refrigerantes = cursor.fetchall()
+
+
         cursor.execute("SELECT id, nome, preco FROM produtos WHERE nome = 'Prefeitura'")
         produtos = cursor.fetchall()
 
@@ -410,7 +417,8 @@ def adicionar_itens_web(pedido_id):
                                pedido_id=pedido_id,
                                pedido=pedido,
                                marmitas=marmitas,
-                               bebidas=bebidas,
+                               sucos=sucos,
+                               refrigerantes=refrigerantes,
                                produtos=produtos,
                                **get_template_date_vars())
 

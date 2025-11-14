@@ -145,36 +145,40 @@ def _verificar_e_inserir_produtos_iniciais(conn):
             conn.commit()
             print("Produto 'Item Variado' (Item_Variado_Dinamico) inserido ou verificado.")
 
-        # Produtos fixos
         produtos_fixos = [
             ('Marmita P', 22.00, 8.00, 'Marmita_P', 'Refeição'),
             ('Marmita Teste', 0.01, 0.01, 'Marmita_P', 'Refeição'),
             ('Marmita M', 23.50, 10.00, 'Marmita_M', 'Refeição'),
             ('Marmita G', 27.00, 12.00, 'Marmita_G', 'Refeição'),
-            ('Marmita Econômica', 13.99, 6.00, 'Marmita_Economica', 'Refeição'), # Adicionado Marmita Econômica
-            ('Coca-Cola 600ml', 7.00, 4.50, 'Bebida', 'Bebida'),
-            ('Refrigerante 600ml', 7.00, 4.50, 'Bebida', 'Bebida'),
-            ('Coca-Cola KS', 5.00, 2.00, 'Bebida', 'Bebida'),
-            ('TESTE', 0.1, 0.1, 'Bebida', 'Bebida'),
-            ('Coca-Cola KS Zero', 5.00, 2.00, 'Bebida', 'Bebida'),
-            ('Coca-Cola Lata', 6.00, 3.05, 'Bebida', 'Bebida'),
-            ('Lata (Outras)', 6.00, 3.05, 'Bebida', 'Bebida'),
-            ('Caçulinha', 2.50, 1.55, 'Bebida', 'Bebida'),
-            ('Água com Gás', 4.00, 1.55, 'Bebida', 'Bebida'),
-            ('Água sem Gás', 4.00, 1.38, 'Bebida', 'Bebida'),
-            ('Esportiva', 6.00, 2.69, 'Bebida', 'Bebida'),
-            ('Coca-Cola 2L', 15.00, 9.94, 'Bebida', 'Bebida'),
-            ('Coca-Cola 1L', 10.00, 4.30, 'Bebida', 'Bebida'),
-            ('Festa 2L', 6.00, 3.50, 'Bebida', 'Bebida'),
-            ('Itubaina KS', 6.00, 3.50, 'Bebida', 'Bebida'),
-            ('Suco Del Valle', 6.00, 3.29, 'Bebida', 'Bebida'),
-            ('Suco', 8.00, 3.00, 'Bebida', 'Bebida'),
-            ('Suco Peq Limão', 5.00, 2.00, 'Bebida', 'Bebida'),
-            ('Suco Peq Laranja', 5.00, 2.00, 'Bebida', 'Bebida'),
-            ('Suco de Laranja', 10.00, 4.00, 'Bebida', 'Bebida'),
-            ('Jarra de Suco', 18.00, 7.00, 'Bebida', 'Bebida'),
+            ('Marmita Econômica', 13.99, 6.00, 'Marmita_Economica', 'Refeição'),
 
+            # 🔵 Refrigerantes (tipo = Refrigerante)
+            ('Coca-Cola 600ml', 7.00, 4.50, 'Refrigerante', 'Bebida'),
+            ('Refrigerante 600ml', 7.00, 4.50, 'Refrigerante', 'Bebida'),
+            ('Coca-Cola KS', 5.00, 2.00, 'Refrigerante', 'Bebida'),
+            ('Coca-Cola KS Zero', 5.00, 2.00, 'Refrigerante', 'Bebida'),
+            ('Coca-Cola Lata', 6.00, 3.05, 'Refrigerante', 'Bebida'),
+            ('Lata (Outras)', 6.00, 3.05, 'Refrigerante', 'Bebida'),
+            ('Caçulinha', 2.50, 1.55, 'Refrigerante', 'Bebida'),
+            ('Esportiva', 6.00, 2.69, 'Refrigerante', 'Bebida'),
+            ('Coca-Cola 2L', 15.00, 9.94, 'Refrigerante', 'Bebida'),
+            ('Coca-Cola 1L', 10.00, 4.30, 'Refrigerante', 'Bebida'),
+            ('Festa 2L', 6.00, 3.50, 'Refrigerante', 'Bebida'),
+            ('Itubaina KS', 6.00, 3.50, 'Refrigerante', 'Bebida'),
+
+            # 🔵 Águas (mantidas como Bebida)
+            ('Água com Gás', 4.00, 1.55, 'Refrigerante', 'Bebida'),
+            ('Água sem Gás', 4.00, 1.38, 'Refrigerante', 'Bebida'),
+
+            # 🔵 Sucos (tipo = Suco)
+            ('Suco Del Valle', 6.00, 3.29, 'Suco', 'Bebida'),
+            ('Suco', 8.00, 3.00, 'Suco', 'Bebida'),
+            ('Suco Peq Limão', 5.00, 2.00, 'Suco', 'Bebida'),
+            ('Suco Peq Laranja', 5.00, 2.00, 'Suco', 'Bebida'),
+            ('Suco de Laranja', 10.00, 4.00, 'Suco', 'Bebida'),
+            ('Jarra de Suco', 18.00, 7.00, 'Suco', 'Bebida'),
         ]
+
         
         # Produto fixo Prefeitura
         cursor.execute("SELECT id FROM produtos WHERE nome = 'Prefeitura'")

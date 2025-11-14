@@ -80,27 +80,70 @@
             </form>
         </div>
 
-        <!-- 4️⃣ Bebidas -->
+        <!-- 4️⃣ Sucos -->
         <div class="form-section">
-            <h2>Adicionar Bebidas</h2>
+            <h2>Adicionar Sucos</h2>
             <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
                 <input type="hidden" name="tipo_adicao" value="produto_selecionado">
                 <div class="form-group">
-                    <label for="bebida_id">Selecione a Bebida:</label>
-                    <select id="bebida_id" name="produto_id" required>
+                    <label for="suco_id">Selecione o Suco:</label>
+                    <select id="suco_id" name="produto_id" required>
                         <option value="">-- Selecione --</option>
-                        {% for bebida in bebidas %}
-                            <option value="{{ bebida.id }}">{{ bebida.nome }} (R${{ "%.2f"|format(bebida.preco) }})</option>
+                        {% for suco in sucos %}
+                            <option value="{{ suco.id }}">{{ suco.nome }} (R${{ "%.2f"|format(suco.preco) }})</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="qtd_bebida">Quantidade:</label>
-                    <input type="number" id="qtd_bebida" name="quantidade" min="1" value="1" required>
+                    <label for="qtd_suco">Quantidade:</label>
+                    <input type="number" id="qtd_suco" name="quantidade" min="1" value="1" required>
                 </div>
                 <div class="form-group">
-                    <label for="caracteristica_bebida">Características:</label>
-                    <select name="caracteristica_bebida" id="caracteristica_bebida">
+                    <label for="caracteristica_suco">Características:</label>
+                    <select name="caracteristica_suco" id="caracteristica_suco">
+                        <option value="Sem nada">Sem nada</option>
+                        <option value="Só limão">Só limão</option>
+                        <option value="Limão espremido e Gelo">Limão espremido e Gelo</option>
+                        <option value="Gelo e limão">Gelo e limão</option>
+                        <option value="Só gelo">Só gelo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="marmita_suco">Para Marmita:</label>
+                    <select name="marmita_suco" id="marmita_suco">
+                        <option value="Não">Não</option>
+                        <option value="Sim">Sim</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="observacao_suco">Observação (Opcional):</label>
+                    <textarea id="observacao_suco" name="observacao_produto_selecionado" rows="2"></textarea>
+                </div>
+                <button type="submit" class="button primary">Adicionar Suco</button>
+            </form>
+        </div>
+
+         <!-- 4️⃣ Refrigerantes -->
+        <div class="form-section">
+            <h2>Adicionar Refrigerantes</h2>
+            <form method="POST" action="{{ url_for('adicionar_itens_web', pedido_id=pedido_id) }}">
+                <input type="hidden" name="tipo_adicao" value="produto_selecionado">
+                <div class="form-group">
+                    <label for="refrigerante_id">Selecione o Refrigerante:</label>
+                    <select id="refrigerante_id" name="produto_id" required>
+                        <option value="">-- Selecione --</option>
+                        {% for refrigerante in refrigerantes %}
+                            <option value="{{ refrigerante.id }}">{{ refrigerante.nome }} (R${{ "%.2f"|format(refrigerante.preco) }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="qtd_refrigerante">Quantidade:</label>
+                    <input type="number" id="qtd_refrigerante" name="quantidade" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="caracteristica_refrigerante">Características:</label>
+                    <select name="caracteristica_refrigerante" id="caracteristica_refrigerante">
                         <option value="Sem nada">Sem nada</option>
                         <option value="Só limão">Só limão</option>
                         <option value="Limão espremido e Gelo">Limão espremido e Gelo</option>
@@ -117,11 +160,12 @@
                 </div>
                 <div class="form-group">
                     <label for="observacao_bebida">Observação (Opcional):</label>
-                    <textarea id="observacao_bebida" name="observacao_produto_selecionado" rows="2"></textarea>
+                    <textarea id="observacao_refrigerante" name="observacao_produto_selecionado" rows="2"></textarea>
                 </div>
-                <button type="submit" class="button primary">Adicionar Bebida</button>
+                <button type="submit" class="button primary">Adicionar Refrigerante</button>
             </form>
         </div>
+
 
         <!-- 5️⃣ Sobremesa -->
         <div class="form-section">
